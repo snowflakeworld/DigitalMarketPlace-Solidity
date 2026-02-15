@@ -132,7 +132,7 @@
 						"type": "string"
 					}
 				],
-				"name": "ProductMinted",
+				"name": "ProductListed",
 				"type": "event"
 			},
 			{
@@ -216,13 +216,6 @@
 				"type": "function"
 			},
 			{
-				"inputs": [],
-				"name": "WithdrawFunds",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
 				"inputs": [
 					{
 						"internalType": "uint256",
@@ -285,7 +278,7 @@
 							},
 							{
 								"internalType": "bool",
-								"name": "isEnabled",
+								"name": "status",
 								"type": "bool"
 							},
 							{
@@ -357,7 +350,7 @@
 						"type": "string"
 					}
 				],
-				"name": "mintProduct",
+				"name": "listProduct",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -436,7 +429,7 @@
 					},
 					{
 						"internalType": "bool",
-						"name": "isEnabled",
+						"name": "status",
 						"type": "bool"
 					},
 					{
@@ -505,7 +498,7 @@
 						"type": "bool"
 					}
 				],
-				"name": "updateProductAvailability",
+				"name": "updateProductStatus",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -535,6 +528,13 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "withdrawFunds",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"stateMutability": "payable",
 				"type": "receive"
 			}
@@ -552,7 +552,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"digitalmarket.sol": "DigitalMarket"
+			"DigitalMarket.sol": "DigitalMarket"
 		},
 		"evmVersion": "prague",
 		"libraries": {},
@@ -566,12 +566,12 @@
 		"remappings": []
 	},
 	"sources": {
-		"digitalmarket.sol": {
-			"keccak256": "0x2711c844dd501d2b31dfc10156756256edf0cbf7ad72397991cd73220ea561c4",
+		"DigitalMarket.sol": {
+			"keccak256": "0x56593e7cba1c6311f93decc9baf868f72c2baf1df5761596b207f8a5c6859437",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://4003b1a9e4cd84d412380905cafdd67eb5cf9a36918beb7f2beb88ec19d2a6bb",
-				"dweb:/ipfs/QmNoGs3faYpDkPX3urqXGXBJgMA8PdqEy2dDnQbc9pwD1y"
+				"bzz-raw://4b8ae3ec558cfd081437d5633480aeecefca89a4713be54538622de08ca18d83",
+				"dweb:/ipfs/QmXqfUSy7p95LdNWAZbLicKMvf9knj3qei7tv1erdnzntT"
 			]
 		}
 	},

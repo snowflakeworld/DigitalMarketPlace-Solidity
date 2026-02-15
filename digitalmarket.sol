@@ -2,7 +2,7 @@
 pragma solidity ^0.8.26;
 
 contract DigitalMarket {
-    uint256 private productIdCounter;
+    uint256 private _productIdCounter;
     address public platformOwner;
     uint256 public platformFee = 500; // default 5%
 
@@ -22,7 +22,7 @@ contract DigitalMarket {
         uint256 price;
         string ipfsHash;
         address payable owner;
-        bool isEnabled;
+        bool status;
         uint256 createdAt;
     }
 
@@ -31,10 +31,10 @@ contract DigitalMarket {
 
     /*
      *  EVENTS
-     *  ProductMinted, ProductPurchased, OwnershipTransferred, PlatformFeeUpdated, WithdrawnFunds
+     *  ProductListed, ProductPurchased, OwnershipTransferred, PlatformFeeUpdated, FundsWithdrawn
      *
      */
-    event ProductMinted(
+    event ProductListed(
         uint256 indexed productId,
         string name,
         uint256 price,
@@ -72,8 +72,8 @@ contract DigitalMarket {
      *
      */
 
-    modifier productExists(uint256 productId) {
-        require(productId < productIdCounter, "Product does not exist.");
+    modifier productExisting(uint256 productId) {
+        require(productId < _productIdCounter, "Product does not exist.");
         _;
     }
 
@@ -100,7 +100,7 @@ contract DigitalMarket {
     function remoteFromUserProducts(
         address owner,
         uint256 productId
-    ) internal productExists(productId) {
+    ) internal productExisting(productId) {
         for (uint256 i = 0; i < userProducts[owner].length; ++i) {
             if (userProducts[owner][i] == productId) {
                 userProducts[owner][i] = userProducts[owner][
@@ -113,11 +113,11 @@ contract DigitalMarket {
     }
 
     /*
-     * Mint Product
+     * list Product
      * @params (string name, string description, uint256 price, string ipfsHash)
      * @returns(productId)
      */
-    function mintProduct(
+    function listProduct(
         string calldata name,
         string calldata description,
         uint256 price,
@@ -127,7 +127,7 @@ contract DigitalMarket {
         require(price > 0, "Price must be greater than 0");
         require(bytes(ipfsHash).length > 0, "IPFS hash requiredd");
 
-        uint256 productId = ++productIdCounter;
+        uint256 productId = ++_productIdCounter;
 
         products[productId] = Product({
             id: productId,
@@ -136,13 +136,13 @@ contract DigitalMarket {
             price: price,
             ipfsHash: ipfsHash,
             owner: payable(IS_TEST ? address(this) : msg.sender),
-            isEnabled: true,
+            status: true,
             createdAt: block.timestamp
         });
 
         userProducts[IS_TEST ? address(this) : msg.sender].push(productId);
 
-        emit ProductMinted(
+        emit ProductListed(
             productId,
             name,
             price,
@@ -160,10 +160,10 @@ contract DigitalMarket {
      */
     function purchaseProduct(
         uint256 productId
-    ) external payable productExists(productId) {
+    ) external payable productExisting(productId) {
         Product storage product = products[productId];
 
-        require(product.isEnabled, "Product is not enabled");
+        require(product.status, "Product is not enabled");
         require(product.owner != msg.sender, "Cannot buy own product");
         require(msg.value >= product.price, "Insufficient ETH sent");
 
@@ -207,7 +207,7 @@ contract DigitalMarket {
     function transferOwnership(
         uint256 productId,
         address newOwner
-    ) external productExists(productId) onlyProductOwner(productId) {
+    ) external productExisting(productId) onlyProductOwner(productId) {
         require(newOwner != msg.sender, "Cannot transfer to self");
 
         Product storage product = products[productId];
@@ -242,7 +242,7 @@ contract DigitalMarket {
      * @params void
      * @returns void
      */
-    function WithdrawFunds() external onlyPlatformOwner {
+    function withdrawFunds() external onlyPlatformOwner {
         uint256 balance = address(this).balance;
         require(balance > 0, "No funds to withdraw");
 
@@ -253,19 +253,19 @@ contract DigitalMarket {
     }
 
     /*
-     * Update Product Availability
+     * Update Product Status
      * @params (uint256 productId, bool enabled)
      * @returns (void)
      */
-    function updateProductAvailability(
+    function updateProductStatus(
         uint256 productId,
         bool enabled
-    ) external productExists(productId) {
+    ) external productExisting(productId) {
         require(
             products[productId].owner == msg.sender,
             "Only owner can do this"
         );
-        products[productId].isEnabled = enabled;
+        products[productId].status = enabled;
 
         emit ProductAvailabilityChanged(msg.sender, productId, enabled);
     }
@@ -277,7 +277,7 @@ contract DigitalMarket {
      */
     function getProduct(
         uint256 productId
-    ) external view productExists(productId) returns (Product memory) {
+    ) external view productExisting(productId) returns (Product memory) {
         return products[productId];
     }
 
@@ -298,7 +298,7 @@ contract DigitalMarket {
      * @returns (uint256)
      */
     function getTotalProductCount() external view returns (uint256) {
-        return productIdCounter;
+        return _productIdCounter;
     }
 
     /*
