@@ -6,7 +6,18 @@
 	"output": {
 		"abi": [
 			{
-				"inputs": [],
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_platformFee",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_listingFee",
+						"type": "uint256"
+					}
+				],
 				"stateMutability": "nonpayable",
 				"type": "constructor"
 			},
@@ -27,6 +38,25 @@
 					}
 				],
 				"name": "FundsWithdrawn",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "oldFee",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "newFee",
+						"type": "uint256"
+					}
+				],
+				"name": "ListingFeeUpdated",
 				"type": "event"
 			},
 			{
@@ -77,25 +107,19 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": true,
+						"indexed": false,
 						"internalType": "address",
-						"name": "owner",
+						"name": "oldOwner",
 						"type": "address"
 					},
 					{
-						"indexed": true,
-						"internalType": "uint256",
-						"name": "productId",
-						"type": "uint256"
-					},
-					{
 						"indexed": false,
-						"internalType": "bool",
-						"name": "enabled",
-						"type": "bool"
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
 					}
 				],
-				"name": "ProductAvailabilityChanged",
+				"name": "PlatformOwnerChanged",
 				"type": "event"
 			},
 			{
@@ -173,6 +197,31 @@
 				"type": "event"
 			},
 			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "productId",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "bool",
+						"name": "enabled",
+						"type": "bool"
+					}
+				],
+				"name": "ProductStatusChanged",
+				"type": "event"
+			},
+			{
 				"stateMutability": "payable",
 				"type": "fallback"
 			},
@@ -191,12 +240,12 @@
 			},
 			{
 				"inputs": [],
-				"name": "IS_TEST",
+				"name": "MAX_LISTING_FEE",
 				"outputs": [
 					{
-						"internalType": "bool",
+						"internalType": "uint256",
 						"name": "",
-						"type": "bool"
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -204,7 +253,7 @@
 			},
 			{
 				"inputs": [],
-				"name": "MAX_FEE",
+				"name": "MAX_PLATFORM_FEE",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -223,7 +272,26 @@
 						"type": "uint256"
 					}
 				],
-				"name": "calculateFee",
+				"name": "calculateListingFeePrice",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "price",
+						"type": "uint256"
+					}
+				],
+				"name": "calculatePlatformFeePrice",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -311,17 +379,17 @@
 			{
 				"inputs": [
 					{
-						"internalType": "address",
-						"name": "user",
-						"type": "address"
+						"internalType": "uint256",
+						"name": "productId",
+						"type": "uint256"
 					}
 				],
-				"name": "getUserProductIds",
+				"name": "isUserOwningProduct",
 				"outputs": [
 					{
-						"internalType": "uint256[]",
+						"internalType": "bool",
 						"name": "",
-						"type": "uint256[]"
+						"type": "bool"
 					}
 				],
 				"stateMutability": "view",
@@ -358,12 +426,12 @@
 						"type": "uint256"
 					}
 				],
-				"stateMutability": "nonpayable",
+				"stateMutability": "payable",
 				"type": "function"
 			},
 			{
 				"inputs": [],
-				"name": "platformFee",
+				"name": "listingFee",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -376,12 +444,12 @@
 			},
 			{
 				"inputs": [],
-				"name": "platformOwner",
+				"name": "platformFee",
 				"outputs": [
 					{
-						"internalType": "address",
+						"internalType": "uint256",
 						"name": "",
-						"type": "address"
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -480,7 +548,33 @@
 						"type": "uint256"
 					}
 				],
+				"name": "updateListingFee",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "newFee",
+						"type": "uint256"
+					}
+				],
 				"name": "updatePlatformFee",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "updatePlatformOwner",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -494,7 +588,7 @@
 					},
 					{
 						"internalType": "bool",
-						"name": "enabled",
+						"name": "status",
 						"type": "bool"
 					}
 				],
@@ -516,12 +610,12 @@
 						"type": "uint256"
 					}
 				],
-				"name": "userProducts",
+				"name": "user2products",
 				"outputs": [
 					{
-						"internalType": "uint256",
+						"internalType": "bool",
 						"name": "",
-						"type": "uint256"
+						"type": "bool"
 					}
 				],
 				"stateMutability": "view",
@@ -567,11 +661,11 @@
 	},
 	"sources": {
 		"DigitalMarket.sol": {
-			"keccak256": "0x56593e7cba1c6311f93decc9baf868f72c2baf1df5761596b207f8a5c6859437",
+			"keccak256": "0xced9199272c1822dd1b808317f5fad218e786f1c5894c37cff4068d7d7773fe7",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://4b8ae3ec558cfd081437d5633480aeecefca89a4713be54538622de08ca18d83",
-				"dweb:/ipfs/QmXqfUSy7p95LdNWAZbLicKMvf9knj3qei7tv1erdnzntT"
+				"bzz-raw://fa07849ed950ce86b64bbf9ef8bf9f851c27253c8f413235e65dfcf6601861f0",
+				"dweb:/ipfs/QmXrFGdD1pFYMSjJax3FH5LsPHWg2obwJ6TXQoJaknvh71"
 			]
 		}
 	},
