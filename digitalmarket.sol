@@ -20,8 +20,8 @@ contract DigitalMarket {
     }
 
     uint256 public constant FEE_DENOMINATOR = 10000; // Fee Divisor (100%)
-    uint256 public constant MAX_PLATFORM_FEE = 1000; // Platform Maxfee 10%
-    uint256 public constant MAX_LISTING_FEE = 1000; // Product Listing maxfee 10%
+    uint256 public constant MAX_PLATFORM_FEE = 3000; // Platform Maxfee 30%
+    uint256 public constant MAX_LISTING_FEE = 3000; // Product Listing maxfee 30%
 
     bool private constant _IS_TEST = true;
 
