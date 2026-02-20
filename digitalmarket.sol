@@ -152,7 +152,7 @@ contract DigitalMarket {
         payable
         validPrice(price)
         sufficientBalance(price)
-        returns (uint256 productId)
+        returns (uint256)
     {
         require(bytes(name).length > 0, "Name cannot be empty");
         require(bytes(ipfsHash).length > 0, "IPFS hash requiredd");
@@ -165,10 +165,10 @@ contract DigitalMarket {
         address contractAddress = address(this);
         address ownerAddress = msg.sender;
 
-        productId = ++_productIdCounter;
+        ++_productIdCounter;
 
-        products[productId] = Product({
-            id: productId,
+        products[_productIdCounter] = Product({
+            id: _productIdCounter,
             name: name,
             description: description,
             price: price,
@@ -179,16 +179,18 @@ contract DigitalMarket {
         });
 
         user2products[_IS_TEST ? contractAddress : ownerAddress][
-            productId
+            _productIdCounter
         ] = true;
 
         emit ProductListed(
-            productId,
+            _productIdCounter,
             name,
             price,
             _IS_TEST ? contractAddress : ownerAddress,
             ipfsHash
         );
+
+        return _productIdCounter;
     }
 
     /*
