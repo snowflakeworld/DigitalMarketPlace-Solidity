@@ -23,7 +23,7 @@ contract DigitalMarket {
     uint256 public constant MAX_PLATFORM_FEE = 3000; // Platform Maxfee 30%
     uint256 public constant MAX_LISTING_FEE = 3000; // Product Listing maxfee 30%
 
-    bool private constant _IS_TEST = true;
+    bool private constant _IS_TEST = false;
 
     /*
      *   State Variables
@@ -165,10 +165,10 @@ contract DigitalMarket {
         address contractAddress = address(this);
         address ownerAddress = msg.sender;
 
-        ++_productIdCounter;
+        uint256 productId = ++_productIdCounter;
 
-        products[_productIdCounter] = Product({
-            id: _productIdCounter,
+        products[productId] = Product({
+            id: productId,
             name: name,
             description: description,
             price: price,
@@ -179,18 +179,18 @@ contract DigitalMarket {
         });
 
         user2products[_IS_TEST ? contractAddress : ownerAddress][
-            _productIdCounter
+            productId
         ] = true;
 
         emit ProductListed(
-            _productIdCounter,
+            productId,
             name,
             price,
             _IS_TEST ? contractAddress : ownerAddress,
             ipfsHash
         );
 
-        return _productIdCounter;
+        return productId;
     }
 
     /*
