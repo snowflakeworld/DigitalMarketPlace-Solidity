@@ -362,6 +362,15 @@ contract DigitalMarket {
     }
 
     /*
+     * Get Platform Owner
+     * @params (void)
+     * @returns (address)
+     */
+    function getPlatformOwner() external view returns (address) {
+        return _platformOwner;
+    }
+
+    /*
      * Get Total Product Count
      * @params (void)
      * @returns (uint256)
