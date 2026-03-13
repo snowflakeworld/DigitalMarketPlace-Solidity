@@ -661,11 +661,11 @@
 	},
 	"sources": {
 		"DigitalMarket.sol": {
-			"keccak256": "0xced9199272c1822dd1b808317f5fad218e786f1c5894c37cff4068d7d7773fe7",
+			"keccak256": "0x98370dae3bd094f546f340b633e0d956714e31bd5d56255511130d36de7967df",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://fa07849ed950ce86b64bbf9ef8bf9f851c27253c8f413235e65dfcf6601861f0",
-				"dweb:/ipfs/QmXrFGdD1pFYMSjJax3FH5LsPHWg2obwJ6TXQoJaknvh71"
+				"bzz-raw://df7b97edde45977f76f7891c190b346e24b91cb9be698584948123da66c1617e",
+				"dweb:/ipfs/QmThCWzFJsHy49FBXeBJW978tda5m6H1cGaLXt4iscbqGD"
 			]
 		}
 	},

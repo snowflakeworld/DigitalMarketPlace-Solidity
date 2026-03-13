@@ -23,7 +23,7 @@ contract DigitalMarket {
     uint256 public constant MAX_PLATFORM_FEE = 1000; // Platform Max fee 10%
     uint256 public constant MAX_LISTING_FEE = 1000; // Product Listing max fee 10%
 
-    bool private constant _IS_TEST = true;
+    bool private constant _IS_TEST = false;
 
     /*
      *   State Variables
@@ -137,7 +137,6 @@ contract DigitalMarket {
     receive() external payable {}
     fallback() external payable {}
 
-
     /*
      * list Product
      * @params (string name, string description, uint256 price, string ipfsHash)
@@ -148,7 +147,13 @@ contract DigitalMarket {
         string calldata description,
         uint256 price,
         string calldata ipfsHash
-    ) external payable validPrice(price) sufficientBalance(price) returns (uint256) {
+    )
+        external
+        payable
+        validPrice(price)
+        sufficientBalance(price)
+        returns (uint256)
+    {
         require(bytes(name).length > 0, "Name cannot be empty");
         require(bytes(ipfsHash).length > 0, "IPFS hash required");
         require(
@@ -157,6 +162,8 @@ contract DigitalMarket {
         );
 
         // List a product
+        address contractAddress = address(this);
+        address ownerAddress = msg.sender;
 
         uint256 productId = ++_productIdCounter;
 
@@ -166,18 +173,20 @@ contract DigitalMarket {
             description: description,
             price: price,
             ipfsHash: ipfsHash,
-            owner: payable(_IS_TEST ? address(this) : msg.sender),
+            owner: payable(_IS_TEST ? contractAddress : ownerAddress),
             status: true,
             createdAt: block.timestamp
         });
 
-        user2products[_IS_TEST ? address(this) : msg.sender][productId] = true;
+        user2products[_IS_TEST ? contractAddress : ownerAddress][
+            productId
+        ] = true;
 
         emit ProductListed(
             productId,
             name,
             price,
-            _IS_TEST ? address(this) : msg.sender,
+            _IS_TEST ? contractAddress : ownerAddress,
             ipfsHash
         );
 
@@ -198,7 +207,9 @@ contract DigitalMarket {
         require(product.owner != msg.sender, "Cannot buy own product");
         require(msg.value >= product.price, "Insufficient ETH sent");
 
-        address payable previousOwner = product.owner;
+        address payable productOwnerAddress = product.owner;
+        address payable buyerAddress = payable(msg.sender);
+
         uint256 feeAmount = (product.price * platformFee) / FEE_DENOMINATOR;
         uint256 ownerAmount = product.price - feeAmount;
 
@@ -206,16 +217,16 @@ contract DigitalMarket {
         user2products[product.owner][productId] = false;
 
         // Set new owner and add productId to new owner's list
-        product.owner = payable(msg.sender);
-        user2products[msg.sender][productId] = true;
+        product.owner = buyerAddress;
+        user2products[buyerAddress][productId] = true;
 
         // Send ETH
-        (bool success, ) = previousOwner.call{value: ownerAmount}("");
+        (bool success, ) = productOwnerAddress.call{value: ownerAmount}("");
         require(success, "Transfer ETH to owner failed");
 
         // Refund remaining ETH
         if (msg.value > product.price) {
-            (bool refundSuccess, ) = payable(msg.sender).call{
+            (bool refundSuccess, ) = buyerAddress.call{
                 value: msg.value - product.price
             }("");
             require(refundSuccess, "Refund remaining ETH failed");
@@ -223,8 +234,8 @@ contract DigitalMarket {
 
         emit ProductPurchased(
             productId,
-            previousOwner,
-            msg.sender,
+            productOwnerAddress,
+            buyerAddress,
             product.price,
             platformFee
         );
@@ -351,6 +362,15 @@ contract DigitalMarket {
     }
 
     /*
+     * Get Platform Owner
+     * @params (void)
+     * @returns (address)
+     */
+    function getPlatformOwner() external view returns (address) {
+        return _platformOwner;
+    }
+
+    /*
      * Get Total Product Count
      * @params (void)
      * @returns (uint256)
@@ -364,7 +384,9 @@ contract DigitalMarket {
      * @params (uint256 price)
      * @returns (uint256)
      */
-    function calculatePlatformFeePrice(uint256 price) public view returns (uint256) {
+    function calculatePlatformFeePrice(
+        uint256 price
+    ) public view returns (uint256) {
         return (price * platformFee) / FEE_DENOMINATOR;
     }
 
@@ -373,7 +395,9 @@ contract DigitalMarket {
      * @params (uint256 price)
      * @returns (uint256)
      */
-    function calculateListingFeePrice(uint256 price) public view returns (uint256) {
+    function calculateListingFeePrice(
+        uint256 price
+    ) public view returns (uint256) {
         return (price * listingFee) / FEE_DENOMINATOR;
     }
 }
